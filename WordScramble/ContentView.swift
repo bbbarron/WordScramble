@@ -7,6 +7,7 @@
 //  Based on WordScramble by Paul Hudson
 //  Hacking with SwiftUI
 //
+//
 
 import SwiftUI
 
@@ -30,7 +31,7 @@ struct ContentView: View {
                 Section {
                     ForEach(usedWords, id: \.self) { word in
                         HStack {
-                            Image(systemName: "\(word.count).circle")
+                            Image(systemName: "\(word.count).circle.fill")
                             Text(word)
                         }
                     }
@@ -44,12 +45,24 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
+            .toolbar {
+                Button("New Game", action: startGame)
+            }
         }
     }
 
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        guard answer.count > 0 else { return }
+        guard answer.count > 3 else {
+            wordError(title: "Word too short", message: "Words must greater than 3 characters")
+            return
+        }
+            
+        guard answer != rootWord else {
+            wordError(title: "Nice try…", message: "You can't use your starting word!")
+            return
+        }
+
 
         guard isOriginal(word: answer) else {
             wordError(title: "Word used already", message: "Be more original!")
@@ -69,11 +82,14 @@ struct ContentView: View {
         withAnimation {
             usedWords.insert(answer, at: 0)
         }
-
         newWord = ""
     }
 
     func startGame() {
+        
+        newWord = ""
+        usedWords.removeAll()
+        
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
                 let allWords = startWords.components(separatedBy: "\n")
