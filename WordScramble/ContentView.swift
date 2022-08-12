@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
     @State private var newWord = ""
+    @State private var score = 0
 
     @State private var errorTitle = ""
     @State private var errorMessage = ""
@@ -47,6 +48,14 @@ struct ContentView: View {
             }
             .toolbar {
                 Button("New Game", action: startGame)
+            }
+            .safeAreaInset(edge: .bottom) {
+                Text("Score: \(score)")
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(.blue)
+                    .foregroundColor(.white)
+                    .font(.title)
             }
         }
     }
@@ -83,6 +92,7 @@ struct ContentView: View {
             usedWords.insert(answer, at: 0)
         }
         newWord = ""
+        score += 2 + answer.count // 2 extra points for a new word
     }
 
     func startGame() {
